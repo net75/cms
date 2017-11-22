@@ -1,0 +1,33 @@
+<?php
+
+namespace app\admin\model;
+
+class Model extends \think\Model
+{
+
+    // 表名
+    protected $name = 'model';
+    // 自动写入时间戳字段
+    protected $autoWriteTimestamp = 'int';
+    // 定义时间戳字段名
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
+    // 追加属性
+    protected $append = [
+    ];
+
+    public static function init()
+    {
+        self::afterInsert(function($row) {
+            $prefix = \think\Config::get('database.prefix');
+            $sql = "CREATE TABLE `{$prefix}{$row['table']}` (`id` int(10) NOT NULL,`content` longtext NOT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='{$row['name']}'";
+            db()->query($sql);
+        });
+    }
+
+    public function getFieldsAttr($value, $data)
+    {
+        return is_array($value) ? $value : ($value ? explode(',', $value) : []);
+    }
+
+}
